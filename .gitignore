@@ -1,0 +1,7 @@
+*.rpm
+*.spec
+cronos/*
+myriad/*
+minion/*
+noarch/*
+.build*

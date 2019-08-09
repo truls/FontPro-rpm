@@ -1,0 +1,172 @@
+#!/usr/bin/rpm
+
+%global tl_version 2018
+%{!?_texdir: %global _texdir %{_datadir}/texlive}
+
+%global _pdftex_map %{_texdir}/texmf-dist/fonts/map/pdftex/updmap/pdftex.map
+%global _dvips_map %{_texdir}/texmf-dist/fonts/map/dvips/updmap/psfonts.map
+%define __map_script() if ! grep -q "\% %1" %2; then              \
+    echo "\% %1.map" >> %2                                        \
+    cat %{_texdir}/texmf-dist/fonts/map/dvips/%1/%1.map >> %2     \
+fi
+%define _map_script() %{__map_script %{1} %{_pdftex_map}}         \
+%{__map_script %{1} %{_dvips_map}}
+
+%define _sed_cmd() '/\% %{1}/,/\%.*/{//!d};/\% %{1}/d'
+%define _cleanup_script() sed -i %{_sed_cmd %{1}} %{_pdftex_map}  \
+sed -i %{_sed_cmd %{1}} %{_dvips_map}
+
+%define filespec() %{_texdir}/texmf-dist/fonts/enc/dvips/%1      \
+%{_texdir}/texmf-dist/fonts/map/dvips/%1                         \
+%{_texdir}/texmf-dist/fonts/type1/adobe/%1                       \
+%{_texdir}/texmf-dist/fonts/tfm/adobe/%1                         \
+%{_texdir}/texmf-dist/fonts/vf/adobe/%1                          \
+%{_texdir}/texmf-dist/tex/latex/%1
+
+
+Name: texlive-fontpro
+
+Version: %{tl_version}
+Release: 1%{?dist}
+
+Source0: myriad
+Source1: minion
+Source2: cronos
+BuildArch: noarch
+
+Summary: Package for installing Adobe fonts
+License: Adobe Font License
+
+%description
+ font for latex
+
+Requires: texlive-base texlive-kpathsea
+
+%package cronospro
+Provides: tex-cronospro = %{tl_version}
+License: Adobe Font License
+Summary: Adobe CronosPro font
+Version: $$$CRONOS_VERSION$$$
+
+$$$CRONOS_PROVIDES$$$
+
+%description cronospro
+Adobe CronosPro font
+
+%package cronospro-doc
+Summary: Documentation for CronosPro
+Version: $$$CRONOS_VERSION$$$
+
+Provides: tex-cronospro-doc
+AutoReqProv: No
+
+%description cronospro-doc
+Documentation for the CronosPro font
+
+
+%package myriadpro
+Provides: tex-myriadpro = %{tl_version}
+License: Adobe Font License
+Summary: Adobe MyriadPro font
+Version: $$$MYRIAD_VERSION$$$
+
+$$$MYRIAD_PROVIDES$$$
+
+%description myriadpro
+Adobe MyriadPro font
+
+%package myriadpro-doc
+Summary: Documentation for MyriadPro
+Version: $$$MYRIAD_VERSION$$$
+
+Provides: tex-myriadpro-doc
+AutoReqProv: No
+
+%description myriadpro-doc
+Documentation for the MyriadPro font
+
+%package minionpro
+Provides: tex-minionpro = %{tl_version}
+License: Adobe Font License
+Summary: Adobe MinionPro font
+Version: $$$MINION_VERSION$$$
+
+$$$MINION_PROVIDES$$$
+
+%description minionpro
+Adobe MinionPro font
+
+%package minionpro-doc
+Summary: Documentation for MinionPro
+Version: $$$MINION_VERSION$$$
+
+Provides: tex-minionpro-doc
+AutoReqProv: No
+
+%description minionpro-doc
+Documentation for the MinionPro font
+
+
+%install
+mkdir -p %{buildroot}%{_texdir}/../texmf
+mkdir -p %{buildroot}%{_texdir}/texmf-config/web2c
+mkdir -p %{buildroot}%{_texmf_var}
+mkdir -p %{buildroot}%{_texdir}/texmf-dist
+mkdir -p %{buildroot}%{_texdir}/texmf-local
+
+OUTDIR="%{buildroot}%{_texdir}/texmf-dist"
+echo "Source %{sources}"
+echo %{sourcedir}
+for s in %{sources}; do
+    pushd $s
+    cp -a . $OUTDIR/.
+    rm $OUTDIR/.keep
+    popd
+done
+
+%files cronospro
+%filespec CronosPro
+
+%files cronospro-doc
+%{_texdir}/texmf-dist/doc/latex/CronosPro
+
+%filetriggerin cronospro -- %_pdftex_map %_dvips_map
+%_map_script CronosPro
+
+%post cronospro
+%_map_script CronosPro
+
+%postun cronospro
+%_cleanup_script CronosPro
+
+
+%files myriadpro
+%filespec MyriadPro
+
+%files myriadpro-doc
+%{_texdir}/texmf-dist/doc/latex/MyriadPro
+
+%filetriggerin myriadpro -- %_pdftex_map %_dvips_map
+%_map_script MyriadPro
+
+%post myriadpro
+%_map_script MyriadPro
+
+%postun myriadpro
+%_cleanup_script MyriadPro
+
+
+%files minionpro
+%filespec MinionPro
+
+%files minionpro-doc
+%{_texdir}/texmf-dist/doc/latex/MinionPro
+
+%filetriggerin minionpro -- %_pdftex_map %_dvips_map
+%_map_script MinionPro
+
+%post minionpro
+%_map_script MinionPro
+
+%postun minionpro
+%_cleanup_script MinionPro
