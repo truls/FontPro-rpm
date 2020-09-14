@@ -43,3 +43,7 @@ packages. Therefore, this package will
     Obviously, change this command if you're not running Fedora 30.
 
 4. The generated packages can be found in the `noarch` directory.
+
+## Tested on
+     - Fedora 30
+     - Fedora 31

@@ -40,7 +40,7 @@ License: Adobe Font License
 %description
  font for latex
 
-Requires: texlive-base texlive-kpathsea
+Requires: texlive-base texlive-kpathsea texlive-fltpoint texlive-fontaxes
 
 %package cronospro
 Provides: tex-cronospro = %{tl_version}
